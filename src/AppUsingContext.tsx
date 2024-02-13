@@ -32,7 +32,7 @@ const AppContextWrapper = ({ children }) => {
 function Totals() {
   const { fruits, sizes } = useContext(AppContext);
 
-  console.log("Totals rerendered");
+  console.log("Totals rerendered using Context");
   return (
     <>
       <dt>Totals</dt>
@@ -58,7 +58,7 @@ function Fruits() {
     addFruit(fruit);
   };
 
-  console.log("Fruits rerendered");
+  console.log("Fruits rerendered using Context");
   return (
     <>
       <dt>Fruits</dt>
@@ -89,7 +89,7 @@ function Sizes() {
     addSize(size);
   };
 
-  console.log("Sizes rerendered");
+  console.log("Sizes rerendered using Context");
   return (
     <>
       <dt>Sizes</dt>
