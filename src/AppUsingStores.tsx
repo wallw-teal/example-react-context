@@ -18,7 +18,7 @@ function Totals() {
   const fruits = useReadable(fruitStore);
   const sizes = useReadable(sizeStore);
 
-  console.log("Totals rerendered");
+  console.log("Totals rerendered using Store");
   return (
     <>
       <dt>Totals</dt>
@@ -44,7 +44,7 @@ function Fruits() {
     addFruit(fruit);
   };
 
-  console.log("Fruits rerendered");
+  console.log("Fruits rerendered using Store");
   return (
     <>
       <dt>Fruits</dt>
@@ -75,7 +75,7 @@ function Sizes() {
     addSize(size);
   };
 
-  console.log("Sizes rerendered");
+  console.log("Sizes rerendered using Store");
   return (
     <>
       <dt>Sizes</dt>

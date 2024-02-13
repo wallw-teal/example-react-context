@@ -1,38 +1,52 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, memo } from "react";
 import "./App.css";
 
-type AppContextType = {
-  fruits: string[];
-  addFruit: (fruit: string) => void;
-  sizes: string[];
-  addSize: (size: string) => void;
-};
+// Fruits Context
+const FruitsContext = createContext({
+  fruits: [],
+  addFruit: () => {},
+});
 
-const AppContext = createContext<AppContextType>({} as AppContextType);
+const FruitsProvider = ({ children }) => {
+  const [fruits, setFruits] = useState(["apple", "banana", "orange"]);
 
-const AppContextWrapper = ({ children }) => {
-  const [fruits, setFruits] = useState<string[]>(["apple", "banana", "orange"]);
-  const [sizes, setSizes] = useState<string[]>(["small", "medium", "large"]);
-
-  const addFruit = (fruit: string) => {
-    setFruits([...fruits, fruit]);
-  };
-
-  const addSize = (size: string) => {
-    setSizes([...sizes, size]);
+  const addFruit = (fruit) => {
+    setFruits((prevFruits) => [...prevFruits, fruit]);
   };
 
   return (
-    <AppContext.Provider value={{ fruits, addFruit, sizes, addSize }}>
+    <FruitsContext.Provider value={{ fruits, addFruit }}>
       {children}
-    </AppContext.Provider>
+    </FruitsContext.Provider>
   );
 };
 
-function Totals() {
-  const { fruits, sizes } = useContext(AppContext);
+// Sizes Context
+const SizesContext = createContext({
+  sizes: [],
+  addSize: () => {},
+});
 
-  console.log("Totals rerendered");
+const SizesProvider = ({ children }) => {
+  const [sizes, setSizes] = useState(["small", "medium", "large"]);
+
+  const addSize = (size) => {
+    setSizes((prevSizes) => [...prevSizes, size]);
+  };
+
+  return (
+    <SizesContext.Provider value={{ sizes, addSize }}>
+      {children}
+    </SizesContext.Provider>
+  );
+};
+
+
+const Totals = memo(() => {
+  const { fruits } = useContext(FruitsContext);
+  const { sizes } = useContext(SizesContext);
+
+  console.log("Totals rerendered using Context");
   return (
     <>
       <dt>Totals</dt>
@@ -45,30 +59,27 @@ function Totals() {
       </dd>
     </>
   );
-}
+});
 
-function Fruits() {
-  const { fruits, addFruit } = useContext(AppContext);
+const Fruits = memo(() => {
+  const { fruits, addFruit } = useContext(FruitsContext);
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
-
-    const form = evt.target;
-    const fruit = form.fruit.value;
+    const fruit = evt.target.fruit.value;
     addFruit(fruit);
   };
 
-  console.log("Fruits rerendered");
+  console.log("Fruits rerendered using Context");
   return (
     <>
       <dt>Fruits</dt>
       <dd>
         <ul>
-          {fruits.map((fruit) => (
-            <li key={fruit}>{fruit}</li>
+          {fruits.map((fruit, index) => (
+            <li key={index}>{fruit}</li>
           ))}
         </ul>
-
         <form onSubmit={handleSubmit}>
           <input type="text" name="fruit" placeholder="Add fruit" />
           <button type="submit">Add</button>
@@ -76,27 +87,25 @@ function Fruits() {
       </dd>
     </>
   );
-}
+});
 
-function Sizes() {
-  const { sizes, addSize } = useContext(AppContext);
+const Sizes = memo(() => {
+  const { sizes, addSize } = useContext(SizesContext);
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
-
-    const form = evt.target;
-    const size = form.size.value;
+    const size = evt.target.size.value;
     addSize(size);
   };
 
-  console.log("Sizes rerendered");
+  console.log("Sizes rerendered using Context");
   return (
     <>
       <dt>Sizes</dt>
       <dd>
         <ul>
-          {sizes.map((size) => (
-            <li key={size}>{size}</li>
+          {sizes.map((size, index) => (
+            <li key={index}>{size}</li>
           ))}
         </ul>
         <form onSubmit={handleSubmit}>
@@ -106,31 +115,22 @@ function Sizes() {
       </dd>
     </>
   );
-}
+});
+
 
 function AppUsingContext() {
   return (
     <>
       <h2>Using React Context</h2>
-      <AppContextWrapper>
-        <section>
-          <Totals />
-          <Fruits />
-          <Sizes />
-        </section>
-      </AppContextWrapper>
-
-      <ul>
-        <li>Totals section needs to rerender when either section changes.</li>
-        <li>
-          Fruits section <em>should</em> only need to rerender when the{" "}
-          <code>fruits</code> list changes.
-        </li>
-        <li>
-          Sizes section <em>should</em> only need to rerender when the{" "}
-          <code>sizes</code> list changes.
-        </li>
-      </ul>
+      <FruitsProvider>
+        <SizesProvider>
+          <section>
+            <Totals />
+            <Fruits />
+            <Sizes />
+          </section>
+        </SizesProvider>
+      </FruitsProvider>
     </>
   );
 }
